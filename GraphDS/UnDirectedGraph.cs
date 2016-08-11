@@ -99,5 +99,44 @@ namespace Algorithms.Graphs {
             }
             return aPoints;
         }
+        
+        public override bool IsCyclic() {
+
+             bool[] isVisited = new bool[graphStructure.Keys.Count+1];
+             bool[] isCompletedT = new bool[graphStructure.Keys.Count + 1];
+             int[] parent = new int[graphStructure.Keys.Count + 1];
+             foreach (int edge in graphStructure.Keys){
+                 if (isVisited[edge]) continue;
+                 Stack<int> tracker = new Stack<int>();
+                 tracker.Push(edge);
+                 isVisited[edge] = true;
+
+                 while (tracker.Count > 0){
+                     int key = tracker.Peek();
+                     bool isCompleted = true;
+                     foreach (int ed in graphStructure[key]) {
+                         //Not a back edge.
+                         if (ed == parent[key]) continue;
+                         if (isVisited[ed] ) {
+                             // Found in other flow rather pop on stack
+                             if (!isCompletedT[ed]){
+                                 return true;
+                             }
+                             continue;
+                         }
+                         
+                         parent[ed] = key;
+                         isCompleted = false;
+                         isVisited[ed] = true;
+                         tracker.Push(ed);
+                         break;
+                     }
+                     if (isCompleted) {
+                         isCompletedT[tracker.Pop()] = true;
+                     }
+                 }
+             }
+             return false;
+         }
     }
 }
